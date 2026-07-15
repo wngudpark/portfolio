@@ -49,7 +49,12 @@
       "Bash(echo \"=== description에 개행\\(\\\\\\\\n\\) 보존됐나 ===\")",
       "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); const f=c.find\\(x=>x.id==='freelance-example'\\); console.log\\(JSON.stringify\\(f.description\\)\\)\")",
       "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('slug\\(global\\):', d.get\\('slug'\\)\\); c=[x for x in d['collections'] if x['name']=='careers'][0]; print\\('careers identifier_field:', c.get\\('identifier_field'\\), '| slug:', c.get\\('slug'\\)\\)\")",
-      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); c=[x for x in d['collections'] if x['name']=='careers'][0]; pos=[f for f in c['fields'] if f['name']=='position'][0]; print\\('YAML OK'\\); print\\('position label:', pos['label']\\)\")"
+      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); c=[x for x in d['collections'] if x['name']=='careers'][0]; pos=[f for f in c['fields'] if f['name']=='position'][0]; print\\('YAML OK'\\); print\\('position label:', pos['label']\\)\")",
+      "Bash(node -e \"const p=require\\('./dist/data/projects.json'\\); const t=p.find\\(x=>x.id==='_build-test'\\); console.log\\('images:', JSON.stringify\\(t.images\\)\\); console.log\\('count\\(<=3\\):', t.images.length\\); console.log\\('thumbnail_url:', t.thumbnail_url\\)\")",
+      "Bash(node -e \"const p=require\\('./dist/data/projects.json'\\); console.log\\('남은 프로젝트 수:', p.length\\)\")",
+      "Bash(node -e \"const p=require\\('./dist/data/projects.json'\\); console.log\\(p.map\\(x=>x.id\\)\\)\")",
+      "Bash(node -e \"const p=require\\('./dist/data/projects.json'\\)[0]; console.log\\('title:',p.title\\); console.log\\('images:',JSON.stringify\\(p.images\\)\\); console.log\\('thumbnail_url:',p.thumbnail_url\\)\")",
+      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); pj=[c for c in d['collections'] if c['name']=='projects'][0]; print\\('projects fields:', [f['name'] for f in pj['fields']]\\)\")"
     ]
   }
 }

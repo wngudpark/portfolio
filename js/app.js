@@ -307,9 +307,16 @@ function detailHtml(p) {
     )
     .join('');
 
-  const thumb = p.thumbnail_url
-    ? `<img src="${escapeHtml(p.thumbnail_url)}" alt="${escapeHtml(p.title)}"
-         class="mt-6 max-h-[26rem] w-full rounded-xl object-cover" />`
+  // Detail view: show every image at full size (natural aspect, not cropped).
+  const images = p.images && p.images.length ? p.images : (p.thumbnail_url ? [p.thumbnail_url] : []);
+  const gallery = images.length
+    ? `<div class="mt-6 space-y-4">${images
+        .map(
+          (src) =>
+            `<img src="${escapeHtml(src)}" alt="${escapeHtml(p.title)}"
+               class="w-full rounded-xl border border-slate-200" loading="lazy" />`
+        )
+        .join('')}</div>`
     : '';
 
   const linkBtn = p.link
@@ -331,7 +338,7 @@ function detailHtml(p) {
       ${p.description ? `<p class="mt-2 text-slate-600">${escapeHtml(p.description)}</p>` : ''}
       ${stack ? `<div class="mt-4 flex flex-wrap gap-1.5">${stack}</div>` : ''}
       ${linkBtn ? `<div class="mt-5">${linkBtn}</div>` : ''}
-      ${thumb}
+      ${gallery}
     </header>
     <article class="prose mt-8 max-w-none">${content}</article>`;
 }

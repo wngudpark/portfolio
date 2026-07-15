@@ -89,13 +89,13 @@ collections:
           hint: "항목을 하나씩 추가하세요",
         }
       - { name: link, label: 링크 (URL), widget: string, required: false }
-      - {
-          name: thumbnail,
-          label: 썸네일 이미지,
-          widget: image,
-          required: false,
-          choose_url: false,
-        }
+      - name: images
+        label: 이미지 (최대 3개)
+        widget: list
+        required: false
+        max: 3
+        hint: "첫 번째 이미지가 목록 카드의 썸네일로 쓰입니다"
+        field: { name: image, label: 이미지, widget: image, choose_url: false }
       - { name: body, label: 상세 내용, widget: markdown }
 
   - name: careers

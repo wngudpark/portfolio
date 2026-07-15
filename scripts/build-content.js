@@ -49,17 +49,30 @@ function normalizeStack(stack) {
   return [];
 }
 
+// Up to 3 project images. Accepts the new `images` list, or falls back to a
+// legacy single `thumbnail`. Paths are normalized to relative.
+function normalizeImages(data) {
+  let list = [];
+  if (Array.isArray(data.images)) list = data.images;
+  else if (data.thumbnail) list = [data.thumbnail];
+  return list.map(toRelative).filter(Boolean).slice(0, 3);
+}
+
 function buildProjects() {
-  const items = readCollection('projects').map(({ id, data, content }) => ({
-    id,
-    title: data.title || id,
-    year: data.year != null ? String(data.year) : '',
-    description: data.description || '',
-    stack: normalizeStack(data.stack),
-    link: data.link || '',
-    thumbnail_url: toRelative(data.thumbnail),
-    detail_html: rewriteAssetPaths(marked.parse(content || ''))
-  }));
+  const items = readCollection('projects').map(({ id, data, content }) => {
+    const images = normalizeImages(data);
+    return {
+      id,
+      title: data.title || id,
+      year: data.year != null ? String(data.year) : '',
+      description: data.description || '',
+      stack: normalizeStack(data.stack),
+      link: data.link || '',
+      images,
+      thumbnail_url: images[0] || null, // first image = list card thumbnail
+      detail_html: rewriteAssetPaths(marked.parse(content || ''))
+    };
+  });
   // Newest year first, then stable by id.
   items.sort((a, b) => (b.year || '').localeCompare(a.year || '') || a.id.localeCompare(b.id));
   return items;
