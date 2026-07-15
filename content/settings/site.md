@@ -1,6 +1,6 @@
 ---
 role: Developer
-name: 박주형22
+name: 박주형
 tagline: 꾸준히 배우고 만드는 것을 좋아하는 개발자입니다.
 skills:
   - JavaScript
