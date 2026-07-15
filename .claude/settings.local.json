@@ -57,7 +57,9 @@
       "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); pj=[c for c in d['collections'] if c['name']=='projects'][0]; print\\('projects fields:', [f['name'] for f in pj['fields']]\\)\")",
       "Bash(echo \"=== 짧은 설명: \\\\\\\\n 보존? ===\")",
       "Bash(node -e \"const t=require\\('./dist/data/projects.json'\\).find\\(x=>x.id==='_break-test'\\); console.log\\(JSON.stringify\\(t.description\\)\\)\")",
-      "Bash(node -e \"const t=require\\('./dist/data/projects.json'\\).find\\(x=>x.id==='_break-test'\\); console.log\\(t.detail_html\\)\")"
+      "Bash(node -e \"const t=require\\('./dist/data/projects.json'\\).find\\(x=>x.id==='_break-test'\\); console.log\\(t.detail_html\\)\")",
+      "Bash(sed -n '/<section id=\"career\"/,/<\\\\/section>/p' index.html)",
+      "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); console.log\\(JSON.stringify\\(c[0],null,2\\)\\); console.log\\('총', c.length,'건'\\)\")"
     ]
   }
 }

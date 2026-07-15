@@ -167,14 +167,58 @@ function formatPeriod(start, end) {
   return `${s} ~ ${e}`;
 }
 
+// ===== Total career duration =====
+// Parse "YYYY-MM" / "YYYY.MM" into { y, mo }; null if unparseable.
+function parseYearMonth(value) {
+  const m = String(value ?? '').match(/(\d{4})[.\-/](\d{1,2})/);
+  return m ? { y: +m[1], mo: +m[2] } : null;
+}
+
+// Months spanned by one entry. Empty end_date = ongoing (counted up to `now`).
+// Simple month difference (2024.04 ~ 2026.08 → 28), no +1.
+function careerMonths(c, now) {
+  const s = parseYearMonth(c.start_date);
+  if (!s) return 0;
+  const e = c.end_date
+    ? parseYearMonth(c.end_date)
+    : { y: now.getFullYear(), mo: now.getMonth() + 1 };
+  if (!e) return 0;
+  const diff = (e.y - s.y) * 12 + (e.mo - s.mo);
+  return diff > 0 ? diff : 0;
+}
+
+// Sum every entry's duration → "n년 n개월" (or "n개월" under a year). '' if none.
+function calculateTotalCareer(careerList) {
+  if (!Array.isArray(careerList) || careerList.length === 0) return '';
+  const now = new Date();
+  const total = careerList.reduce((sum, c) => sum + careerMonths(c, now), 0);
+  if (total <= 0) return '';
+  const years = Math.floor(total / 12);
+  const months = total % 12;
+  if (years === 0) return `${months}개월`;
+  if (months === 0) return `${years}년`;
+  return `${years}년 ${months}개월`;
+}
+
 // ===== Careers (public) =====
 async function loadCareers() {
   const list = document.getElementById('career-list');
   const empty = document.getElementById('career-empty');
+  const badge = document.getElementById('career-total-badge');
   list.innerHTML = `<p class="text-slate-400">불러오는 중...</p>`;
+
+  // Toggle the total-career badge (hidden when there's nothing to show).
+  const showBadge = (text) => {
+    if (!badge) return;
+    const on = !!text;
+    badge.classList.toggle('hidden', !on);
+    badge.classList.toggle('inline-flex', on);
+    if (on) badge.querySelector('[data-total]').textContent = `총 경력 ${text}`;
+  };
 
   try {
     const careers = await getCareers();
+    showBadge(calculateTotalCareer(careers));
 
     if (!careers.length) {
       list.innerHTML = '';
@@ -186,6 +230,7 @@ async function loadCareers() {
     list.innerHTML = careers.map((c) => careerCard(c)).join('');
     if (window.lucide) window.lucide.createIcons();
   } catch (err) {
+    showBadge('');
     list.innerHTML = `<p class="text-red-500">경력을 불러오지 못했습니다.</p>`;
   }
 }
@@ -390,4 +435,4 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // expose for potential reuse
-window.App = { navigate, loadProjects, loadCareers, escapeHtml, formatPeriod };
+window.App = { navigate, loadProjects, loadCareers, escapeHtml, formatPeriod, calculateTotalCareer };
