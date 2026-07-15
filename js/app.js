@@ -271,12 +271,7 @@ function projectCard(p) {
       </div>
       ${p.description ? `<p class="mt-2 flex-1 whitespace-pre-line text-sm leading-relaxed text-slate-600">${escapeHtml(p.description)}</p>` : '<div class="flex-1"></div>'}
       <div class="mt-4 flex flex-wrap gap-1.5">${stack}</div>
-      <div class="mt-4 flex items-center justify-between">
-        <span class="inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
-          자세히 보기 <i data-lucide="arrow-right" class="h-4 w-4"></i>
-        </span>
-        ${linkHtml}
-      </div>
+      ${linkHtml ? `<div class="mt-4 flex items-center justify-end">${linkHtml}</div>` : ''}
     </article>`;
 }
 
