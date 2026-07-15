@@ -1,8 +1,8 @@
 ---
-company: 프리랜서
-position: 웹 개발 (프론트엔드 / 백엔드)
+company: (재)예술경영지원센터
+position: 웹 개발
 freelance: true
-start_date: "2023-01"
-end_date: "2023-12"
-description: 여러 클라이언트의 웹사이트와 관리자 도구를 개발했습니다. 주요 작업 - 쇼핑몰 프론트엔드, 예약 시스템 API, 사내 대시보드.
+start_date: 2020-08
+end_date: 2020-11
+description: 관람료 쿠폰 신청 관련 SW개발 및 운영 서버 관리
 ---
