@@ -1,189 +1,255 @@
-# Developer Portfolio
+# Developer Portfolio (Static + Decap CMS)
 
-Vanilla JS SPA 프론트엔드 + Express/SQLite 백엔드로 만든 개발자 포트폴리오 사이트입니다.
-관리자 로그인 후 프로젝트를 추가/수정/삭제할 수 있습니다.
+Vanilla JS 기반 포트폴리오 SPA입니다. 백엔드/DB 없이 **GitHub Pages**로 배포되며,
+콘텐츠(프로젝트·경력)는 저장소 안의 마크다운 파일로 관리합니다. 관리자 편집은
+**GitHub 계정 로그인 기반의 [Decap CMS](https://decapcms.org/)** 화면(`/admin`)에서 처리합니다.
 
-## 주요 기능
+기존 Express + SQLite + 비밀번호 로그인 구조를 걷어내고, 다음과 같이 바뀌었습니다.
 
-- **SPA**: 새로고침 없이 Home / Introduce / Career / Project 섹션 전환 (History API 경로 라우팅, 깔끔한 URL)
-- **경력(Career)**: 회사·직무·재직기간(재직중이면 "현재")·담당 업무를 최신순으로 표시, 관리자에서 CRUD
-- **프로젝트 상세**: 카드 클릭 → `/project/:id` 상세 화면. 새로고침·링크 공유 가능하며,
-  본문은 마크다운으로 작성해 **marked + DOMPurify**(XSS 방지)로 렌더링
-- **반응형**: Tailwind CSS(로컬 빌드) + Lucide 아이콘, 모바일 대응
-- **관리자**: `/admin` 경로에서 비밀번호 로그인 → 프로젝트 CRUD (마크다운 상세 + 실시간 미리보기)
-- **보안**:
-  - 관리자 비밀번호는 **bcrypt 해시**로 `.env`에만 저장 (평문 저장 안 함)
-  - `POST/PUT/DELETE /api/projects`는 **서버에서 세션 인증 필수**, `GET`은 공개
-  - 세션 쿠키(httpOnly, sameSite), CORS는 지정된 origin만 허용
+| 이전 | 현재 |
+| --- | --- |
+| Express API (`/api/...`) | 빌드 시 생성한 정적 JSON (`data/*.json`) |
+| SQLite DB | `content/**/*.md` 마크다운 파일 |
+| 비밀번호 로그인 + 커스텀 관리 UI | Decap CMS (GitHub OAuth 로그인) |
+| 서버에서 직접 서빙 | GitHub Pages 정적 호스팅 + GitHub Actions 배포 |
 
-## 기술 스택
+---
 
-| 구분     | 사용 기술                                        |
-| -------- | ------------------------------------------------ |
-| Frontend | HTML, Tailwind CSS (CLI 빌드), Lucide, marked, DOMPurify, Vanilla JS SPA |
-| Backend  | Node.js, Express, multer(업로드)                 |
-| DB       | SQLite (`better-sqlite3`)                        |
-| 인증     | express-session + bcryptjs                       |
-
-## 폴더 구조
+## 프로젝트 구조
 
 ```
 portfolio/
-├─ backend/
-│  ├─ server.js            # Express 앱 진입점 (API + 정적 파일 서빙)
-│  ├─ routes/
-│  │  ├─ auth.js           # /api/login, /api/logout, /api/me
-│  │  ├─ projects.js       # /api/projects CRUD
-│  │  └─ careers.js        # /api/careers CRUD
-│  ├─ middleware/
-│  │  └─ auth.js           # requireAuth (세션 검사)
-│  ├─ db/
-│  │  ├─ database.js       # SQLite 연결
-│  │  ├─ init.js           # 스키마 생성 + 샘플 시드
-│  │  └─ portfolio.db      # (init 후 자동 생성)
-│  ├─ scripts/
-│  │  └─ hash-password.js  # 비밀번호 → bcrypt 해시 생성
-│  ├─ .env.example
-│  └─ .env                 # (직접 생성, git 제외)
-├─ frontend/
-│  ├─ index.html
-│  ├─ css/
-│  │  ├─ input.css         # Tailwind 지시어 (빌드 소스)
-│  │  ├─ output.css        # 빌드 결과물 (커밋됨, HTML이 로드)
-│  │  └─ styles.css        # 커스텀 컴포넌트 스타일
-│  └─ js/
-│     ├─ app.js            # SPA 라우터 + 공개 화면
-│     └─ admin.js          # 관리자 로그인 + CRUD
-├─ tailwind.config.js      # content 경로, theme.extend(brand 색상)
-├─ postcss.config.js
-├─ package.json
-└─ README.md
+├─ index.html              # SPA 셸 (Home / Introduce / Career / Project)
+├─ css/
+│  ├─ input.css            # Tailwind 진입점
+│  ├─ styles.css           # 커스텀 컴포넌트 스타일 + .prose 타이포그래피
+│  └─ output.css           # (빌드 결과물 — git 무시)
+├─ js/
+│  └─ app.js               # 해시 라우터 + 정적 JSON 렌더링
+├─ admin/
+│  ├─ index.html           # Decap CMS 진입점
+│  └─ config.yml           # CMS 컬렉션/백엔드 설정
+├─ content/
+│  ├─ projects/*.md        # 프로젝트 (frontmatter + 본문)
+│  └─ careers/*.md         # 경력 (frontmatter만)
+├─ static/images/          # 업로드 이미지 (Decap media_folder)
+├─ scripts/
+│  ├─ build-content.js     # content/*.md → dist/data/*.json (gray-matter + marked)
+│  ├─ copy-static.js       # 정적 자산 → dist/
+│  ├─ clean.js             # dist/ 초기화
+│  └─ serve.js             # 로컬 미리보기 서버 (의존성 없음)
+├─ .github/workflows/deploy.yml   # GitHub Pages 자동 배포
+├─ tailwind.config.js
+└─ package.json
 ```
 
-## 로컬 실행 방법
+빌드 결과물은 모두 `dist/`에 생성되며, 이 폴더가 그대로 GitHub Pages에 배포됩니다.
 
-### 1. 의존성 설치
+---
+
+## 콘텐츠 작성 형식
+
+### 프로젝트 — `content/projects/<slug>.md`
+
+파일 이름(`<slug>`)이 상세 페이지 URL(`#/project/<slug>`)이 됩니다.
+
+```markdown
+---
+title: 개발자 포트폴리오 사이트
+year: "2026"                         # 문자열. "2024.01 - 2024.06" 같은 기간도 가능
+description: 한 줄 요약 설명
+stack:                               # 배열
+  - HTML
+  - Tailwind CSS
+link: https://github.com/you/repo    # 선택 (없으면 비워두기)
+thumbnail: /static/images/cover.png  # 선택 (없으면 아이콘 플레이스홀더 표시)
+---
+
+## 상세 내용
+
+여기부터가 본문입니다. **마크다운** 문법(제목, 리스트, 코드블럭, 인용문, 링크 등)을
+그대로 사용할 수 있으며, 빌드 시 HTML로 렌더링됩니다.
+```
+
+### 경력 — `content/careers/<slug>.md`
+
+경력은 본문 없이 frontmatter만 사용합니다.
+
+```markdown
+---
+company: 브라이트벨
+position: Backend Developer
+start_date: "2024-01"    # YYYY-MM
+end_date: ""             # 비우면 "재직중"으로 표시
+description: 담당 업무 설명
+---
+```
+
+### 사이트 설정 — `content/settings/site.md`
+
+Home 히어로(직함·이름·한 줄 소개)와 Introduce 섹션(자기소개 본문·Skills)을 관리합니다.
+CMS의 **사이트 설정 → 홈 / 소개**에서 편집하며, 값이 없으면 `index.html`의 기본값이 표시됩니다.
+
+```markdown
+---
+role: Developer            # Home 대형 타이틀
+name: 박주형               # Home 우측 하단 이름
+tagline: 한 줄 소개
+skills:                    # Introduce의 Skills 배지 목록
+  - JavaScript
+  - Node.js
+---
+
+자기소개 본문입니다. **마크다운**으로 작성하며 Introduce 섹션에 렌더링됩니다.
+```
+
+> 이미지 경로는 `/static/images/...` 형태로 참조합니다. 빌드 스크립트가 앞의 `/`를
+> 제거해 상대 경로로 바꾸므로, 프로젝트 페이지(`user.github.io/portfolio/`)의 하위 경로에서도
+> 이미지가 정상적으로 로드됩니다.
+
+---
+
+## 로컬에서 미리보기 / 빌드
 
 ```bash
+# 1) 의존성 설치 (최초 1회)
 npm install
+
+# 2) 전체 빌드 (content → JSON, Tailwind CSS, 정적 자산 복사 → dist/)
+npm run build
+
+# 3) 미리보기 서버 실행 → http://localhost:8080
+npm run preview
 ```
 
-### 2. 환경변수 설정
+개별 스크립트:
 
-`backend/.env.example`을 복사해 `backend/.env`를 만듭니다.
+| 명령 | 설명 |
+| --- | --- |
+| `npm run build:content` | `content/*.md`를 파싱해 `dist/data/*.json` 생성 |
+| `npm run build:css` | Tailwind CSS 빌드 (`dist/css/output.css`) |
+| `npm run build` | clean → 자산 복사 → content 빌드 → CSS 빌드 |
+| `npm run preview` | `dist/`를 로컬 서버로 서빙 |
+| `npm run dev` | CSS watch + 미리보기 서버 동시 실행 |
 
-```bash
-# macOS / Linux
-cp backend/.env.example backend/.env
-# Windows (PowerShell)
-Copy-Item backend/.env.example backend/.env
-```
+> `npm run dev`는 CSS만 자동 반영됩니다. `content/*.md`를 수정했다면
+> `npm run build:content`를 다시 실행하세요.
 
-**관리자 비밀번호 해시 생성** — 원하는 비밀번호로 해시를 만들어 `.env`의 `ADMIN_PASSWORD_HASH`에 넣습니다.
+---
 
-```bash
-npm run hash -- "yourPassword"
-```
+## GitHub Pages 활성화
 
-> `.env.example`의 기본 해시는 비밀번호 **`admin123`** 에 해당합니다. 테스트용이며 실제 사용 시 반드시 변경하세요.
+1. 이 저장소를 GitHub(`wngudpark/portfolio`)에 push 합니다.
+2. 저장소 **Settings → Pages**로 이동합니다.
+3. **Build and deployment → Source**를 **GitHub Actions**로 설정합니다.
+   (브랜치 선택 방식이 아닌 Actions 방식입니다.)
+4. `main` 브랜치에 push하면 `.github/workflows/deploy.yml`이 실행되어
+   자동으로 빌드 후 배포됩니다.
 
-세션 시크릿도 무작위 문자열로 바꿔 주세요.
+배포 URL: **https://wngudpark.github.io/portfolio/**
 
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
+> 저장소 이름을 바꾸거나 사용자/조직 페이지(`wngudpark.github.io`)로 쓰는 경우,
+> 사이트가 서브 경로 없이 루트에서 서빙될 수 있습니다. 이 프로젝트는 모든 경로를
+> **상대 경로**로 참조하므로 두 경우 모두 별도 수정 없이 동작합니다.
 
-### 3. DB 초기화 (스키마 생성 + 샘플 데이터)
+### CI가 하는 일
 
-```bash
-npm run init-db
-```
+`main`에 push(직접 커밋 또는 CMS 커밋)될 때마다:
 
-### 4. CSS 빌드 (Tailwind)
+1. `content/*.md`를 파싱해 정적 JSON을 재생성하고
+2. Tailwind CSS를 빌드한 뒤
+3. `dist/`를 공식 GitHub Pages 액션(`actions/deploy-pages`)으로 배포합니다.
 
-Tailwind CSS는 CDN이 아니라 **로컬 빌드** 방식입니다. `frontend/css/input.css`를
-컴파일해 `frontend/css/output.css`를 생성하며, HTML은 이 파일을 로드합니다.
+---
 
-```bash
-# 프로덕션 빌드 (minify) — 서버 실행/배포 전에 최소 1회 필요
-npm run build:css
+## Decap CMS 접속 및 GitHub OAuth 연동
 
-# 개발 중: 파일 변경을 감지해 자동 재빌드
-npm run watch:css
-```
+### 접속 경로
 
-> **중요:** HTML/JS의 클래스를 바꾸면 `output.css`를 다시 빌드해야 화면에 반영됩니다.
-> 개발 중에는 `npm run watch:css`를 별도 터미널에서 켜 두고, 서버는 `npm run dev`로 실행하세요.
+배포 후 **`https://wngudpark.github.io/portfolio/admin/`** 로 접속합니다.
+사이트 상단 내비게이션의 **Admin** 버튼도 이 경로로 연결됩니다.
 
-**빌드 산출물(`output.css`) 처리 방침**
+### ⚠️ OAuth 프록시가 필요합니다
 
-- 이 프로젝트는 `frontend/css/output.css`를 **저장소에 커밋**합니다. 별도 CI/빌드 파이프라인 없이
-  `git clone` 또는 파일 복사만으로 바로 서빙할 수 있도록 하기 위함입니다. (`.gitignore`에 넣지 않음)
-- 다만 소스(HTML/JS/config)를 수정했다면 **배포 전에 반드시 `npm run build:css`를 실행**해
-  최신 `output.css`를 반영한 뒤 커밋/배포해야 합니다.
-- 배포 파이프라인을 따로 구성한다면, 커밋 대신 배포 단계에서 `npm ci && npm run build:css`를
-  실행하도록 구성해도 됩니다.
+Decap CMS의 `github` 백엔드는 GitHub OAuth로 로그인하는데, OAuth 토큰 교환에는
+**클라이언트 시크릿을 다루는 서버 측 처리**가 필요합니다. GitHub Pages는 정적
+호스팅이라 이 처리를 할 수 없으므로, **별도의 OAuth 프록시**를 두어야 합니다.
+가장 간단한 방법은 **Cloudflare Worker** 기반 프록시입니다. (무료 티어로 충분)
 
-### 5. 서버 실행
-
-```bash
-# 개발 모드 (nodemon, 자동 재시작)
-npm run dev
-
-# 또는 일반 실행
-npm start
-```
-
-- 사이트: <http://localhost:3000>
-- 관리자: <http://localhost:3000/admin>
-
-## 환경변수 설명 (`backend/.env`)
-
-| 변수                  | 설명                                                        |
-| --------------------- | ----------------------------------------------------------- |
-| `PORT`                | 서버 포트 (기본 3000)                                       |
-| `CORS_ORIGIN`         | 허용할 프론트엔드 origin (같은 서버에서 서빙 시 서버 URL)   |
-| `SESSION_SECRET`      | 세션 서명용 시크릿 (긴 무작위 문자열 권장)                  |
-| `ADMIN_PASSWORD_HASH` | 관리자 비밀번호의 bcrypt 해시 (`npm run hash`로 생성)       |
-| `NODE_ENV`            | `production`이면 secure 쿠키 활성화 (HTTPS 필요)            |
-
-## API 명세
-
-| 메서드 | 경로                 | 인증 | 설명             |
-| ------ | -------------------- | ---- | ---------------- |
-| POST   | `/api/login`         | -    | 로그인 `{ password }` |
-| POST   | `/api/logout`        | -    | 로그아웃         |
-| GET    | `/api/me`            | -    | 로그인 상태 확인 |
-| GET    | `/api/projects`      | 공개 | 프로젝트 목록 (`detail_content` 제외, 가볍게) |
-| GET    | `/api/projects/:id`  | 공개 | 프로젝트 단건 (`detail_content` 포함) |
-| POST   | `/api/projects`      | 필요 | 프로젝트 추가    |
-| PUT    | `/api/projects/:id`  | 필요 | 프로젝트 수정    |
-| DELETE | `/api/projects/:id`  | 필요 | 프로젝트 삭제    |
-| GET    | `/api/careers`       | 공개 | 경력 목록 (최신순) |
-| POST   | `/api/careers`       | 필요 | 경력 추가        |
-| PUT    | `/api/careers/:id`   | 필요 | 경력 수정        |
-| DELETE | `/api/careers/:id`   | 필요 | 경력 삭제        |
-
-프로젝트 payload 예시:
-
-추가/수정은 `multipart/form-data`로 전송하며, 다음 필드를 받습니다
-(썸네일 이미지는 선택, `thumbnail` 필드):
+전체 흐름:
 
 ```
-title           프로젝트 제목 (필수)
-year            기간 / 연도
-description      목록 카드용 짧은 한 줄 설명
-stack           기술스택 (배열 또는 콤마 구분 문자열)
-link            GitHub / 데모 URL
-detail_content  상세 페이지 본문 (마크다운)
-thumbnail       썸네일 이미지 파일 (jpg/jpeg/png/webp, 최대 2MB)
+브라우저(/admin) ──▶ OAuth 프록시(/auth) ──▶ GitHub 로그인/승인
+     ▲                                            │
+     └──── access token ◀── 프록시(/callback) ◀───┘
 ```
 
-> `stack`은 배열 또는 콤마로 구분된 문자열 모두 허용되며, DB에는 JSON 배열 문자열로 저장됩니다.
-> `description`은 목록 카드용 짧은 설명, `detail_content`는 상세 화면 전용 마크다운으로 분리되어 있습니다.
+### 1) GitHub OAuth App 생성
 
-## 콘텐츠 수정
+GitHub → **Settings → Developer settings → OAuth Apps → New OAuth App**
 
-- 이름 / 직무 / 소개 문구, Skills 목록, 이메일 주소(Home CTA·footer의 `mailto:`)는
-  `frontend/index.html`과 `frontend/js/app.js`(상단 `SKILLS` 배열)에서 직접 수정합니다.
-- 프로젝트와 경력은 `/admin`에서 관리합니다. (관리자 화면 상단 탭으로 전환)
+- **Application name**: 아무 이름 (예: `portfolio-cms`)
+- **Homepage URL**: `https://wngudpark.github.io/portfolio/`
+- **Authorization callback URL**: 프록시의 콜백 주소
+  예) `https://portfolio-oauth.<계정>.workers.dev/callback`
+
+생성 후 표시되는 **Client ID**와, 새로 발급한 **Client Secret**을 복사해 둡니다.
+
+### 2) Cloudflare Worker OAuth 프록시 배포
+
+Decap용 공개 OAuth 프록시 Worker를 사용합니다. 예를 들어
+[`sterlingwes/decap-proxy`](https://github.com/sterlingwes/decap-proxy)
+또는 [`sveltia/sveltia-cms-auth`](https://github.com/sveltia/sveltia-cms-auth)
+같은 오픈소스 Worker를 그대로 배포하면 됩니다. (둘 다 Decap/Netlify CMS 호환)
+
+1. Cloudflare 대시보드 → **Workers & Pages → Create → Worker** 로 Worker를 만들거나,
+   위 저장소를 `wrangler`로 배포합니다.
+2. Worker 환경 변수(**Settings → Variables**)에 OAuth 앱 정보를 등록합니다.
+
+   | 변수 | 값 |
+   | --- | --- |
+   | `GITHUB_CLIENT_ID` | 1)에서 복사한 Client ID |
+   | `GITHUB_CLIENT_SECRET` | 1)에서 복사한 Client Secret |
+
+   > 변수 이름은 사용하는 Worker 구현마다 다를 수 있습니다
+   > (`OAUTH_CLIENT_ID` 등). 해당 저장소 README를 확인하세요.
+
+3. 배포된 Worker 주소(예: `https://portfolio-oauth.<계정>.workers.dev`)를 확인합니다.
+4. 이 Worker의 콜백 경로(`/callback`)가 1)의 **Authorization callback URL**과
+   정확히 일치해야 합니다.
+
+### 3) `admin/config.yml`의 `base_url` 수정
+
+`admin/config.yml`의 백엔드 설정을 프록시 주소로 바꿉니다.
+
+```yaml
+backend:
+  name: github
+  repo: wngudpark/portfolio
+  branch: main
+  base_url: https://portfolio-oauth.<계정>.workers.dev   # ← 배포한 Worker 주소
+  # auth_endpoint: auth   # 기본값. Worker 구현이 다른 경로를 쓰면 맞춰 수정
+```
+
+수정 후 push → 재배포하면, `/admin`에서 **"Login with GitHub"** 버튼으로 로그인할 수
+있습니다. 저장소에 push 권한이 있는 GitHub 계정만 편집·커밋할 수 있습니다.
+
+### 로컬에서 CMS 테스트 (선택)
+
+OAuth 없이 로컬에서 편집을 테스트하려면 Decap의 로컬 백엔드를 사용합니다.
+
+1. `admin/config.yml`에서 `local_backend: true` 주석을 해제합니다.
+2. 별도 터미널에서 프록시 서버를 실행합니다: `npx decap-server`
+3. `npm run build && npm run preview` 후 `http://localhost:8080/admin/` 접속.
+
+로컬 백엔드는 GitHub 대신 로컬 파일(`content/`)에 바로 저장합니다.
+배포 전에는 반드시 `local_backend`를 다시 주석 처리하세요.
+
+---
+
+## 편집 → 배포 흐름 정리
+
+1. `/admin`에서 GitHub 로그인 후 프로젝트/경력을 추가·수정하고 **Publish**.
+2. Decap CMS가 `content/**/*.md`(및 업로드 이미지)를 `main`에 커밋.
+3. push를 감지한 GitHub Actions가 JSON·CSS를 다시 빌드해 Pages에 배포.
+4. 수십 초 뒤 사이트에 반영됩니다.

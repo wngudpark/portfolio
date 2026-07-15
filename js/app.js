@@ -1,7 +1,10 @@
 // ===== Vanilla JS SPA router (hash-based) + public content rendering =====
+// Data comes from static JSON generated at build time from content/*.md
+// (see scripts/build-content.js). No backend / API.
 
-const ROUTES = ['home', 'introduce', 'career', 'project', 'admin'];
+const ROUTES = ['home', 'introduce', 'career', 'project'];
 const PAGES = [...ROUTES, 'project-detail'];
+// Fallback skills used only if data/site.json fails to load.
 const SKILLS = [
   'JavaScript', 'TypeScript', 'Node.js', 'Express',
   'React', 'HTML/CSS', 'Tailwind CSS', 'SQLite',
@@ -18,31 +21,52 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// Render markdown to sanitized HTML (marked + DOMPurify).
-function renderMarkdown(md) {
-  const raw = window.marked ? window.marked.parse(md || '') : escapeHtml(md);
-  return window.DOMPurify ? window.DOMPurify.sanitize(raw) : raw;
+// Sanitize pre-rendered markdown HTML (produced at build time by marked).
+function sanitize(html) {
+  return window.DOMPurify ? window.DOMPurify.sanitize(html || '') : (html || '');
 }
 
-// Parse the URL path into a route. e.g. "/project/3" -> { name:'project', id:'3' }
-function parsePath() {
-  const parts = location.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
+// ===== Data (static JSON, fetched once and cached) =====
+let _projectsPromise = null;
+let _careersPromise = null;
+let _settingsPromise = null;
+
+function fetchJson(url) {
+  return fetch(url).then((r) => {
+    if (!r.ok) throw new Error(`failed to load ${url}`);
+    return r.json();
+  });
+}
+function getProjects() {
+  if (!_projectsPromise) _projectsPromise = fetchJson('data/projects.json');
+  return _projectsPromise;
+}
+function getCareers() {
+  if (!_careersPromise) _careersPromise = fetchJson('data/careers.json');
+  return _careersPromise;
+}
+function getSettings() {
+  if (!_settingsPromise) _settingsPromise = fetchJson('data/site.json');
+  return _settingsPromise;
+}
+
+// Parse the URL hash into a route. e.g. "#/project/portfolio-site" -> { name:'project', id:'portfolio-site' }
+function parseHash() {
+  const parts = location.hash.replace(/^#/, '').replace(/^\/+/, '').split('/').filter(Boolean);
   if (parts.length === 0) return { name: 'home' };
-  return { name: parts[0].toLowerCase(), id: parts[1] };
+  return { name: parts[0].toLowerCase(), id: parts[1] ? decodeURIComponent(parts[1]) : undefined };
 }
 
-// Programmatic navigation via the History API (clean URLs, no '#').
-function navigate(path) {
-  if (location.pathname !== path) history.pushState({}, '', path);
-  render();
+// Programmatic navigation — just update the hash; the hashchange listener re-renders.
+function navigate(hash) {
+  const target = hash.startsWith('#') ? hash : `#${hash}`;
+  if (location.hash === target) render();
+  else location.hash = target;
 }
 
 function setActiveNav(route) {
   document.querySelectorAll('[data-route]').forEach((el) => {
-    const on = el.dataset.route === route;
-    if (el.classList.contains('nav-link')) el.classList.toggle('active', on);
-    if (el.classList.contains('mobile-link')) el.classList.toggle('active', on);
-    if (el.classList.contains('admin-link')) el.classList.toggle('active', on);
+    el.classList.toggle('active', el.dataset.route === route);
   });
 }
 
@@ -54,7 +78,7 @@ function showSection(id, { flex = false } = {}) {
 }
 
 function render() {
-  const { name, id } = parsePath();
+  const { name, id } = parseHash();
 
   // Hide everything first.
   PAGES.forEach((pid) => {
@@ -75,20 +99,45 @@ function render() {
     setActiveNav(route);
     if (route === 'project') loadProjects();
     if (route === 'career') loadCareers();
-    if (route === 'admin' && window.AdminPanel) window.AdminPanel.onEnter();
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (window.lucide) window.lucide.createIcons();
 }
 
+// ===== Site settings (Home hero + Introduce), from data/site.json =====
+async function applySettings() {
+  let s = {};
+  try {
+    s = await getSettings();
+  } catch (err) {
+    // Keep the static defaults already in the HTML.
+    renderSkills(SKILLS);
+    return;
+  }
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el && value) el.textContent = value;
+  };
+  set('home-role', s.role);
+  set('home-name', s.name);
+  set('home-tagline', s.tagline);
+
+  const bio = document.getElementById('introduce-bio');
+  if (bio && s.intro_html) bio.innerHTML = sanitize(s.intro_html);
+
+  renderSkills(s.skills && s.skills.length ? s.skills : SKILLS);
+}
+
 // ===== Skills =====
-function renderSkills() {
+function renderSkills(skills) {
   const wrap = document.getElementById('skills-list');
-  wrap.innerHTML = SKILLS.map(
-    (s) =>
-      `<span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">${escapeHtml(s)}</span>`
-  ).join('');
+  wrap.innerHTML = (skills || SKILLS)
+    .map(
+      (s) =>
+        `<span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">${escapeHtml(s)}</span>`
+    )
+    .join('');
 }
 
 // Format "2022-03" -> "2022.03"; returns '' for empty.
@@ -97,7 +146,7 @@ function formatMonth(value) {
   return String(value).replace(/-/g, '.');
 }
 
-// Build "2022.03 ~ 2024.06" or "2022.03 ~ 현재" (end_date null = 재직중).
+// Build "2022.03 ~ 2024.06" or "2022.03 ~ 현재" (empty end_date = 재직중).
 function formatPeriod(start, end) {
   const s = formatMonth(start);
   const e = end ? formatMonth(end) : '현재';
@@ -113,9 +162,7 @@ async function loadCareers() {
   list.innerHTML = `<p class="text-slate-400">불러오는 중...</p>`;
 
   try {
-    const res = await fetch('/api/careers');
-    if (!res.ok) throw new Error('failed');
-    const careers = await res.json();
+    const careers = await getCareers();
 
     if (!careers.length) {
       list.innerHTML = '';
@@ -160,9 +207,7 @@ async function loadProjects() {
   list.innerHTML = `<p class="text-slate-400">불러오는 중...</p>`;
 
   try {
-    const res = await fetch('/api/projects');
-    if (!res.ok) throw new Error('failed');
-    const projects = await res.json();
+    const projects = await getProjects();
 
     if (!projects.length) {
       list.innerHTML = '';
@@ -201,7 +246,7 @@ function projectCard(p) {
        </div>`;
 
   return `
-    <article data-detail-id="${p.id}" role="link" tabindex="0"
+    <article data-detail-id="${escapeHtml(p.id)}" role="link" tabindex="0"
       class="flex cursor-pointer flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-brand-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand-100">
       ${thumbHtml}
       <div class="flex items-start justify-between gap-3">
@@ -225,13 +270,12 @@ async function loadProjectDetail(id) {
   body.innerHTML = `<p class="text-slate-400">불러오는 중...</p>`;
 
   try {
-    const res = await fetch(`/api/projects/${encodeURIComponent(id)}`);
-    if (res.status === 404) {
+    const projects = await getProjects();
+    const p = projects.find((x) => x.id === id);
+    if (!p) {
       body.innerHTML = `<p class="text-slate-400">존재하지 않는 프로젝트입니다.</p>`;
       return;
     }
-    if (!res.ok) throw new Error('failed');
-    const p = await res.json();
     body.innerHTML = detailHtml(p);
     if (window.lucide) window.lucide.createIcons();
   } catch (err) {
@@ -258,8 +302,8 @@ function detailHtml(p) {
          <i data-lucide="external-link" class="h-4 w-4"></i> 바로가기</a>`
     : '';
 
-  const content = p.detail_content
-    ? renderMarkdown(p.detail_content)
+  const content = p.detail_html
+    ? sanitize(p.detail_html)
     : `<p class="text-slate-400">상세 내용이 아직 작성되지 않았습니다.</p>`;
 
   return `
@@ -278,7 +322,7 @@ function detailHtml(p) {
 
 // ===== Init =====
 window.addEventListener('DOMContentLoaded', () => {
-  renderSkills();
+  applySettings();
 
   const mobileMenu = document.getElementById('mobile-menu');
 
@@ -287,19 +331,16 @@ window.addEventListener('DOMContentLoaded', () => {
     mobileMenu.classList.toggle('hidden');
   });
 
-  // Intercept internal links (data-route) for client-side navigation.
+  // Close the mobile menu when a nav link is used (hash change handles routing).
   document.body.addEventListener('click', (e) => {
-    const routeLink = e.target.closest('[data-route]');
-    if (routeLink) {
-      e.preventDefault();
+    if (e.target.closest('[data-route]')) {
       mobileMenu.classList.add('hidden');
-      navigate(routeLink.getAttribute('href'));
       return;
     }
     const back = e.target.closest('[data-back]');
     if (back) {
       e.preventDefault();
-      navigate(`/${back.dataset.back}`);
+      navigate(`#/${back.dataset.back}`);
     }
   });
 
@@ -308,23 +349,23 @@ window.addEventListener('DOMContentLoaded', () => {
   list.addEventListener('click', (e) => {
     if (e.target.closest('a')) return;
     const card = e.target.closest('[data-detail-id]');
-    if (card) navigate(`/project/${card.dataset.detailId}`);
+    if (card) navigate(`#/project/${encodeURIComponent(card.dataset.detailId)}`);
   });
   list.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const card = e.target.closest('[data-detail-id]');
     if (card) {
       e.preventDefault();
-      navigate(`/project/${card.dataset.detailId}`);
+      navigate(`#/project/${encodeURIComponent(card.dataset.detailId)}`);
     }
   });
 
-  // Route on browser back/forward and on initial load.
-  window.addEventListener('popstate', render);
+  // Route on hash change and on initial load.
+  window.addEventListener('hashchange', render);
   render();
 
   if (window.lucide) window.lucide.createIcons();
 });
 
-// expose for admin.js
-window.App = { navigate, loadProjects, loadCareers, escapeHtml, renderMarkdown, formatPeriod };
+// expose for potential reuse
+window.App = { navigate, loadProjects, loadCareers, escapeHtml, formatPeriod };

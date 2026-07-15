@@ -1,0 +1,70 @@
+backend:
+  name: github
+  repo: wngudpark/portfolio
+  branch: main
+  # OAuth is handled by an external proxy (GitHub Pages cannot do it alone).
+  # See README ("Decap CMS GitHub OAuth 연동"). Point this at your proxy:
+  base_url: https://YOUR-OAUTH-PROXY.example.workers.dev
+  # auth_endpoint: auth   # default; uncomment/adjust only if your proxy differs
+
+# Uncomment to edit locally with `npx decap-server` (http://localhost:8081):
+# local_backend: true
+
+# Where uploaded images are committed in the repo, and how they are referenced.
+# public_folder keeps a leading slash; the build normalizes it to a relative
+# path so images work under a project subpath (e.g. /portfolio/).
+media_folder: static/images
+public_folder: /static/images
+
+locale: ko
+
+collections:
+  - name: settings
+    label: 사이트 설정
+    editor:
+      preview: false
+    files:
+      - name: site
+        label: 홈 / 소개
+        file: content/settings/site.md
+        format: yaml-frontmatter
+        fields:
+          - { name: role, label: 직함 (Home 대형 타이틀), widget: string, required: false, hint: "예: Developer" }
+          - { name: name, label: 이름, widget: string, required: false }
+          - { name: tagline, label: 한 줄 소개 (Home 우측 하단), widget: text, required: false }
+          - { name: skills, label: Skills, widget: list, required: false, hint: "항목을 하나씩 추가하세요" }
+          - { name: body, label: 자기소개 본문 (Introduce), widget: markdown }
+
+  - name: projects
+    label: 프로젝트
+    label_singular: 프로젝트
+    folder: content/projects
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: yaml-frontmatter
+    summary: "{{title}} ({{year}})"
+    fields:
+      - { name: title, label: 제목, widget: string }
+      - { name: year, label: 연도 / 기간, widget: string, required: false, hint: "예: 2025 또는 2024.01 - 2024.06" }
+      - { name: description, label: 짧은 설명, widget: text, required: false }
+      - { name: stack, label: 기술스택, widget: list, required: false, hint: "항목을 하나씩 추가하세요" }
+      - { name: link, label: 링크 (URL), widget: string, required: false }
+      - { name: thumbnail, label: 썸네일 이미지, widget: image, required: false, choose_url: false }
+      - { name: body, label: 상세 내용, widget: markdown }
+
+  - name: careers
+    label: 경력
+    label_singular: 경력
+    folder: content/careers
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    format: yaml-frontmatter
+    summary: "{{company}} · {{position}}"
+    fields:
+      - { name: company, label: 회사명 / 소속, widget: string }
+      - { name: position, label: 직무 / 포지션, widget: string }
+      - { name: start_date, label: 시작일, widget: string, required: false, hint: "YYYY-MM 형식 (예: 2024-01)" }
+      - { name: end_date, label: 종료일, widget: string, required: false, hint: "비우면 재직중으로 표시됩니다 (예: 2023-12)" }
+      - { name: description, label: 담당 업무 설명, widget: text, required: false }
