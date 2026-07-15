@@ -5,8 +5,10 @@ name = "portfolio-oauth-proxy"
 main = "worker.js"
 compatibility_date = "2026-07-15"
 
-# Do NOT put the OAuth credentials here (this file is committed to the repo).
-# Set them as secrets instead:
-#   npx wrangler secret put GITHUB_CLIENT_ID
+# Client ID is a PUBLIC value, so it can live here as a plain var.
+[vars]
+GITHUB_CLIENT_ID = "Ov23lidaAWmuuh1q2jeh"
+
+# Client SECRET is sensitive — do NOT put it here. Set it as a secret:
 #   npx wrangler secret put GITHUB_CLIENT_SECRET
 # (or via the Cloudflare dashboard → Worker → Settings → Variables and Secrets)

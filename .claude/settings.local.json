@@ -29,7 +29,10 @@
       "Bash(npm install *)",
       "Bash(node -e \"const p=require\\('./dist/data/projects.json'\\); console.log\\(JSON.stringify\\(p[0],null,2\\)\\); console.log\\('IDs:', p.map\\(x=>x.id\\).join\\(', '\\)\\)\")",
       "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); c.forEach\\(x=>console.log\\(x.id, x.start_date||'\\(none\\)', '->', x.end_date||'재직중'\\)\\)\")",
-      "Bash(node -e \"const s=require\\('./dist/data/site.json'\\); console.log\\('role:',s.role,'| name:',s.name\\); console.log\\('tagline:',s.tagline\\); console.log\\('skills:',s.skills.length,'items'\\); console.log\\('intro_html starts:', s.intro_html.slice\\(0,60\\).replace\\(/\\\\n/g,' '\\)\\)\")"
+      "Bash(node -e \"const s=require\\('./dist/data/site.json'\\); console.log\\('role:',s.role,'| name:',s.name\\); console.log\\('tagline:',s.tagline\\); console.log\\('skills:',s.skills.length,'items'\\); console.log\\('intro_html starts:', s.intro_html.slice\\(0,60\\).replace\\(/\\\\n/g,' '\\)\\)\")",
+      "Bash(curl -s -o /tmp/root.txt -w 'HTTP %{http_code}\\\\n' https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/)",
+      "Bash(curl -s -o /tmp/auth.txt -D /tmp/auth.hdr -w 'HTTP %{http_code}\\\\n' 'https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/auth?provider=github&scope=repo')",
+      "Bash(curl -s -D - -o /dev/null 'https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/auth?provider=github&scope=repo')"
     ]
   }
 }
