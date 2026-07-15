@@ -32,7 +32,18 @@
       "Bash(node -e \"const s=require\\('./dist/data/site.json'\\); console.log\\('role:',s.role,'| name:',s.name\\); console.log\\('tagline:',s.tagline\\); console.log\\('skills:',s.skills.length,'items'\\); console.log\\('intro_html starts:', s.intro_html.slice\\(0,60\\).replace\\(/\\\\n/g,' '\\)\\)\")",
       "Bash(curl -s -o /tmp/root.txt -w 'HTTP %{http_code}\\\\n' https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/)",
       "Bash(curl -s -o /tmp/auth.txt -D /tmp/auth.hdr -w 'HTTP %{http_code}\\\\n' 'https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/auth?provider=github&scope=repo')",
-      "Bash(curl -s -D - -o /dev/null 'https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/auth?provider=github&scope=repo')"
+      "Bash(curl -s -D - -o /dev/null 'https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/auth?provider=github&scope=repo')",
+      "Bash(curl -s -o /tmp/cfg.yml -w \"HTTP %{http_code}\\\\n\" \"https://wngudpark.github.io/portfolio/admin/config.yml\")",
+      "Bash(curl -s -o /tmp/admin.html -w \"HTTP %{http_code}\\\\n\" \"https://wngudpark.github.io/portfolio/admin/\")",
+      "Bash(curl -s -w \"\\\\nrepo HTTP %{http_code}\\\\n\" \"https://api.github.com/repos/wngudpark/portfolio\" -o /tmp/repo.json)",
+      "Bash(curl -s -w \"contents HTTP %{http_code}\\\\n\" -o /tmp/contents.json \"https://api.github.com/repos/wngudpark/portfolio/contents/content/projects?ref=main\")",
+      "Bash(curl -s -o /tmp/cfg.yml \"https://wngudpark.github.io/portfolio/admin/config.yml\")",
+      "Bash(python -c \"import yaml,sys; d=yaml.safe_load\\(open\\('/tmp/cfg.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('collections:', [c['name'] for c in d['collections']]\\); print\\('backend:', d['backend']\\)\")",
+      "Bash(curl -s -o cfg_check.yml \"https://wngudpark.github.io/portfolio/admin/config.yml\")",
+      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('cfg_check.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('collections:', [c['name'] for c in d['collections']]\\); print\\('backend:', d['backend']\\); print\\('media_folder:', d.get\\('media_folder'\\), '| public_folder:', d.get\\('public_folder'\\)\\)\")",
+      "Bash(curl -s -D - https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/callback?code=faketestcode123)",
+      "Bash(curl -s https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/callback?code=fake)",
+      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('site_url:', d.get\\('site_url'\\)\\); print\\('display_url:', d.get\\('display_url'\\)\\); print\\('collections:', [c['name'] for c in d['collections']]\\)\")"
     ]
   }
 }

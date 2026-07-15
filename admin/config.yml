@@ -11,6 +11,10 @@ backend:
 # Uncomment to edit locally with `npx decap-server` (http://localhost:8081):
 # local_backend: true
 
+# Link back to the live site from the CMS (top-left logo / "Go to site").
+site_url: https://wngudpark.github.io/portfolio/
+display_url: https://wngudpark.github.io/portfolio/
+
 # Where uploaded images are committed in the repo, and how they are referenced.
 # public_folder keeps a leading slash; the build normalizes it to a relative
 # path so images work under a project subpath (e.g. /portfolio/).
