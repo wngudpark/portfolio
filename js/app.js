@@ -212,7 +212,7 @@ function careerCard(c) {
           <span class="whitespace-nowrap text-sm text-slate-400">${escapeHtml(period)}</span>
         </div>
       </div>
-      ${c.description ? `<p class="mt-3 text-sm leading-relaxed text-slate-600">${escapeHtml(c.description)}</p>` : ''}
+      ${c.description ? `<p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-slate-600">${escapeHtml(c.description)}</p>` : ''}
     </article>`;
 }
 
