@@ -23,6 +23,11 @@ public_folder: /static/images
 
 locale: ko
 
+# Keep readable (unicode) slugs instead of stripping non-ASCII to empty.
+slug:
+  encoding: unicode
+  clean_accents: true
+
 collections:
   - name: settings
     label: 사이트 설정
@@ -98,7 +103,8 @@ collections:
     label_singular: 경력
     folder: content/careers
     create: true
-    slug: "{{slug}}"
+    identifier_field: company
+    slug: "{{company}}-{{start_date}}"
     extension: md
     format: yaml-frontmatter
     summary: "{{company}} · {{position}}"

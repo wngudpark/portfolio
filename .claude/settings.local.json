@@ -47,7 +47,8 @@
       "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); c.forEach\\(x=>console.log\\(x.id, '| freelance:', x.freelance, '|', x.company\\)\\)\")",
       "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); f=[c for c in d['collections'] if c['name']=='careers'][0]['fields']; print\\('careers fields:', [x['name'] for x in f]\\)\")",
       "Bash(echo \"=== description에 개행\\(\\\\\\\\n\\) 보존됐나 ===\")",
-      "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); const f=c.find\\(x=>x.id==='freelance-example'\\); console.log\\(JSON.stringify\\(f.description\\)\\)\")"
+      "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); const f=c.find\\(x=>x.id==='freelance-example'\\); console.log\\(JSON.stringify\\(f.description\\)\\)\")",
+      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('slug\\(global\\):', d.get\\('slug'\\)\\); c=[x for x in d['collections'] if x['name']=='careers'][0]; print\\('careers identifier_field:', c.get\\('identifier_field'\\), '| slug:', c.get\\('slug'\\)\\)\")"
     ]
   }
 }
