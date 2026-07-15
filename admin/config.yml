@@ -110,7 +110,7 @@ collections:
     summary: "{{company}} · {{position}}"
     fields:
       - { name: company, label: 회사명 / 소속, widget: string, hint: "프리랜서면 '프리랜서' 또는 클라이언트명" }
-      - { name: position, label: 직무 / 포지션, widget: string }
+      - { name: position, label: 부서 / 직위, widget: string, hint: "예: 개발부서 / 사원 (구체적 업무는 담당 업무 설명에)" }
       - {
           name: freelance,
           label: 프리랜서 여부,
