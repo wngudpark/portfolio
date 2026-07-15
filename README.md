@@ -25,7 +25,7 @@ portfolio/
 │  ├─ styles.css           # 커스텀 컴포넌트 스타일 + .prose 타이포그래피
 │  └─ output.css           # (빌드 결과물 — git 무시)
 ├─ js/
-│  └─ app.js               # 해시 라우터 + 정적 JSON 렌더링
+│  └─ app.js               # History API 라우터(클린 URL) + 정적 JSON 렌더링
 ├─ admin/
 │  ├─ index.html           # Decap CMS 진입점
 │  └─ config.yml           # CMS 컬렉션/백엔드 설정
@@ -51,7 +51,7 @@ portfolio/
 
 ### 프로젝트 — `content/projects/<slug>.md`
 
-파일 이름(`<slug>`)이 상세 페이지 URL(`#/project/<slug>`)이 됩니다.
+파일 이름(`<slug>`)이 상세 페이지 URL(`/project/<slug>`)이 됩니다.
 
 ```markdown
 ---
@@ -148,9 +148,20 @@ npm run preview
 
 배포 URL: **https://wngudpark.github.io/portfolio/**
 
-> 저장소 이름을 바꾸거나 사용자/조직 페이지(`wngudpark.github.io`)로 쓰는 경우,
-> 사이트가 서브 경로 없이 루트에서 서빙될 수 있습니다. 이 프로젝트는 모든 경로를
-> **상대 경로**로 참조하므로 두 경우 모두 별도 수정 없이 동작합니다.
+### 클린 URL(해시 없는 경로) 처리 방식
+
+라우팅은 `#` 없는 **클린 URL**(`/project`, `/project/<slug>`)을 사용합니다. 정적 호스팅에서
+이를 동작시키기 위해 빌드가 두 가지를 준비합니다.
+
+- **`dist/404.html`** — `index.html` 복사본. GitHub Pages는 존재하지 않는 경로에 이 파일을
+  URL 그대로 서빙하므로, `/project/<slug>` 같은 딥링크·새로고침에서도 앱이 그대로 로드됩니다.
+- **`<base>` 태그** — `index.html` 최상단 스크립트가 사이트 base 경로를 감지해
+  삽입합니다. 덕분에 프로젝트 페이지 서브경로(`/portfolio/`)나 중첩 경로에서도
+  `css/`·`js/`·`data/` 같은 상대 경로 자산이 항상 올바르게 로드됩니다.
+
+> base 자동 감지는 `*.github.io` **프로젝트 페이지**(`/<repo>/`)와 커스텀 도메인/루트(`/`)를
+> 지원합니다. 사용자·조직 페이지(`<user>.github.io` 리포지토리, 루트 서빙)를 쓴다면
+> `index.html`의 감지 스크립트에서 base를 `'/'`로 고정하세요.
 
 ### CI가 하는 일
 

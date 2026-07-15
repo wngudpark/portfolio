@@ -1,0 +1,12 @@
+# Cloudflare Worker config for the Decap CMS GitHub OAuth proxy.
+# Deploy with:  npx wrangler deploy   (run from this oauth-proxy/ folder)
+
+name = "portfolio-oauth-proxy"
+main = "worker.js"
+compatibility_date = "2026-07-15"
+
+# Do NOT put the OAuth credentials here (this file is committed to the repo).
+# Set them as secrets instead:
+#   npx wrangler secret put GITHUB_CLIENT_ID
+#   npx wrangler secret put GITHUB_CLIENT_SECRET
+# (or via the Cloudflare dashboard → Worker → Settings → Variables and Secrets)

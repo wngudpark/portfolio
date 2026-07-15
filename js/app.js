@@ -1,6 +1,14 @@
-// ===== Vanilla JS SPA router (hash-based) + public content rendering =====
+// ===== Vanilla JS SPA router (History API, clean URLs) + public content =====
 // Data comes from static JSON generated at build time from content/*.md
 // (see scripts/build-content.js). No backend / API.
+//
+// Clean URLs on a static host need: (1) a <base> tag (set in index.html) so
+// relative assets resolve at any depth, and (2) a 404.html copy of index.html
+// so deep links load the app on GitHub Pages. Both are handled by the build.
+
+// Site base path, e.g. "/" locally or "/portfolio/" on a project page.
+// Set by the inline detector in index.html; always ends with "/".
+const BASE = (window.__BASE__ || '/').replace(/\/*$/, '/');
 
 const ROUTES = ['home', 'introduce', 'career', 'project'];
 const PAGES = [...ROUTES, 'project-detail'];
@@ -50,18 +58,22 @@ function getSettings() {
   return _settingsPromise;
 }
 
-// Parse the URL hash into a route. e.g. "#/project/portfolio-site" -> { name:'project', id:'portfolio-site' }
-function parseHash() {
-  const parts = location.hash.replace(/^#/, '').replace(/^\/+/, '').split('/').filter(Boolean);
+// Parse the current URL (minus the base) into a route.
+// e.g. "/portfolio/project/portfolio-site" -> { name:'project', id:'portfolio-site' }
+function parsePath() {
+  let p = location.pathname;
+  if (p.startsWith(BASE)) p = p.slice(BASE.length);
+  const parts = p.replace(/^\/+/, '').split('/').filter(Boolean);
   if (parts.length === 0) return { name: 'home' };
   return { name: parts[0].toLowerCase(), id: parts[1] ? decodeURIComponent(parts[1]) : undefined };
 }
 
-// Programmatic navigation — just update the hash; the hashchange listener re-renders.
-function navigate(hash) {
-  const target = hash.startsWith('#') ? hash : `#${hash}`;
-  if (location.hash === target) render();
-  else location.hash = target;
+// Programmatic navigation via the History API (clean URLs, no '#').
+// `route` is the path after the base, e.g. '', 'career', 'project/portfolio-site'.
+function navigate(route) {
+  const url = BASE + String(route).replace(/^\/+/, '');
+  if (location.pathname !== url) history.pushState({}, '', url);
+  render();
 }
 
 function setActiveNav(route) {
@@ -78,7 +90,7 @@ function showSection(id, { flex = false } = {}) {
 }
 
 function render() {
-  const { name, id } = parseHash();
+  const { name, id } = parsePath();
 
   // Hide everything first.
   PAGES.forEach((pid) => {
@@ -331,16 +343,20 @@ window.addEventListener('DOMContentLoaded', () => {
     mobileMenu.classList.toggle('hidden');
   });
 
-  // Close the mobile menu when a nav link is used (hash change handles routing).
+  // Intercept internal links (data-route) for client-side navigation.
   document.body.addEventListener('click', (e) => {
-    if (e.target.closest('[data-route]')) {
+    const routeLink = e.target.closest('[data-route]');
+    if (routeLink) {
+      e.preventDefault();
       mobileMenu.classList.add('hidden');
+      const r = routeLink.dataset.route;
+      navigate(r === 'home' ? '' : r);
       return;
     }
     const back = e.target.closest('[data-back]');
     if (back) {
       e.preventDefault();
-      navigate(`#/${back.dataset.back}`);
+      navigate(back.dataset.back);
     }
   });
 
@@ -349,19 +365,19 @@ window.addEventListener('DOMContentLoaded', () => {
   list.addEventListener('click', (e) => {
     if (e.target.closest('a')) return;
     const card = e.target.closest('[data-detail-id]');
-    if (card) navigate(`#/project/${encodeURIComponent(card.dataset.detailId)}`);
+    if (card) navigate(`project/${encodeURIComponent(card.dataset.detailId)}`);
   });
   list.addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const card = e.target.closest('[data-detail-id]');
     if (card) {
       e.preventDefault();
-      navigate(`#/project/${encodeURIComponent(card.dataset.detailId)}`);
+      navigate(`project/${encodeURIComponent(card.dataset.detailId)}`);
     }
   });
 
-  // Route on hash change and on initial load.
-  window.addEventListener('hashchange', render);
+  // Route on browser back/forward and on initial load.
+  window.addEventListener('popstate', render);
   render();
 
   if (window.lucide) window.lucide.createIcons();

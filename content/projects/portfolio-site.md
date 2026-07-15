@@ -18,7 +18,7 @@ thumbnail: ""
 
 ### 주요 기능
 
-- 새로고침 없는 섹션 전환 (해시 기반 라우팅)
+- 새로고침 없는 섹션 전환 (History API 기반 클린 URL 라우팅)
 - 마크다운으로 작성하는 프로젝트 상세 페이지
 - GitHub 계정 로그인 기반 **Decap CMS** 편집 화면
 - push 시 GitHub Actions로 자동 빌드 & 배포

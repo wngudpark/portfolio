@@ -27,4 +27,9 @@ for (const entry of ENTRIES) {
   if (!fs.existsSync(src)) continue;
   copyRecursive(src, path.join(DIST, entry));
 }
-console.log('Copied static assets -> dist/');
+
+// SPA fallback for GitHub Pages: any unknown deep URL (e.g. /project/foo)
+// is served this file, which is the same app shell as index.html.
+fs.copyFileSync(path.join(ROOT, 'index.html'), path.join(DIST, '404.html'));
+
+console.log('Copied static assets (+ 404.html) -> dist/');
