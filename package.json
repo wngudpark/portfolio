@@ -1,0 +1,40 @@
+{
+  "name": "developer-portfolio",
+  "version": "1.0.0",
+  "description": "Developer portfolio SPA with admin management (Express + SQLite)",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "concurrently -n server,css -c green,cyan \"npm:dev:server\" \"npm:watch:css\"",
+    "dev:server": "nodemon backend/server.js",
+    "init-db": "node backend/db/init.js",
+    "hash": "node backend/scripts/hash-password.js",
+    "build:css": "tailwindcss -i frontend/css/input.css -o frontend/css/output.css --minify",
+    "watch:css": "tailwindcss -i frontend/css/input.css -o frontend/css/output.css --watch"
+  },
+  "keywords": [
+    "portfolio",
+    "express",
+    "sqlite",
+    "spa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.3.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-session": "^1.18.0",
+    "multer": "^2.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.5.2",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.4",
+    "postcss": "^8.5.18",
+    "tailwindcss": "^3.4.19"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(npm install *)",
+      "PowerShell(npm run *)",
+      "PowerShell(npm start *)",
+      "PowerShell(npm audit *)",
+      "Bash(node backend/db/init.js)",
+      "Bash(node -e \"const db=require\\('./backend/db/database'\\); console.log\\(db.prepare\\('PRAGMA table_info\\(projects\\)'\\).all\\(\\).map\\(c=>c.name\\).join\\(', '\\)\\)\")",
+      "Bash(curl -s -o /dev/null -w 'status=%{http_code} type=%{content_type} size=%{size_download}\\\\n' http://localhost:3000/css/output.css)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(npm ls *)",
+      "Bash(node -e ' *)",
+      "Bash(curl -s -o /dev/null -w 'index status=%{http_code}\\\\n' http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/api/projects/11)",
+      "Bash(node -e \"let s='';process.stdin.on\\('data',d=>s+=d\\).on\\('end',\\(\\)=>{try{const p=JSON.parse\\(s\\);console.log\\('detail endpoint OK, title=',p.title,'| has detail_content:', 'detail_content' in p\\)}catch\\(e\\){console.log\\('not our API:',s.slice\\(0,60\\)\\)}}\\)\")",
+      "PowerShell(Start-Process -FilePath \"node\" -ArgumentList \"backend/server.js\" -WindowStyle Hidden -RedirectStandardOutput \"backend/.server-out.log\" -RedirectStandardError \"backend/.server-err.log\")",
+      "PowerShell(\"--- out ---\")",
+      "PowerShell(\"--- err ---\")",
+      "Bash(cd *)",
+      "Bash(curl -s http://localhost:3000/css/output.css)",
+      "Bash(npm run *)",
+      "Bash(echo \"started npm run dev \\(bg pid $!\\)\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"home status=%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(grep -o 'ADMIN_PASSWORD_HASH=.\\\\{0,20\\\\}' backend/.env)",
+      "Bash(grep -o 'ADMIN_PASSWORD_HASH=.\\\\{0,20\\\\}' backend/.env.example)"
+    ]
+  }
+}
