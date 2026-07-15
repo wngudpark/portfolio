@@ -269,7 +269,7 @@ function projectCard(p) {
         <h3 class="text-lg font-bold text-slate-900">${escapeHtml(p.title)}</h3>
         ${p.year ? `<span class="whitespace-nowrap text-sm text-slate-400">${escapeHtml(p.year)}</span>` : ''}
       </div>
-      ${p.description ? `<p class="mt-2 flex-1 text-sm leading-relaxed text-slate-600">${escapeHtml(p.description)}</p>` : '<div class="flex-1"></div>'}
+      ${p.description ? `<p class="mt-2 flex-1 whitespace-pre-line text-sm leading-relaxed text-slate-600">${escapeHtml(p.description)}</p>` : '<div class="flex-1"></div>'}
       <div class="mt-4 flex flex-wrap gap-1.5">${stack}</div>
       <div class="mt-4 flex items-center justify-between">
         <span class="inline-flex items-center gap-1 text-sm font-semibold text-brand-600">
@@ -335,7 +335,7 @@ function detailHtml(p) {
         <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">${escapeHtml(p.title)}</h1>
         ${p.year ? `<span class="text-slate-400">${escapeHtml(p.year)}</span>` : ''}
       </div>
-      ${p.description ? `<p class="mt-2 text-slate-600">${escapeHtml(p.description)}</p>` : ''}
+      ${p.description ? `<p class="mt-2 whitespace-pre-line text-slate-600">${escapeHtml(p.description)}</p>` : ''}
       ${stack ? `<div class="mt-4 flex flex-wrap gap-1.5">${stack}</div>` : ''}
       ${linkBtn ? `<div class="mt-5">${linkBtn}</div>` : ''}
       ${gallery}

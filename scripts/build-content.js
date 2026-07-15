@@ -13,7 +13,9 @@ const { marked } = require('marked');
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'dist', 'data');
 
-marked.setOptions({ gfm: true, breaks: false });
+// breaks: true → single newlines become <br>, matching what CMS authors expect
+// when they press Enter in the markdown editor.
+marked.setOptions({ gfm: true, breaks: true });
 
 // Read every *.md file in content/<dir> into { id, data, content }.
 // id is the filename without extension and is used as the route param (#/project/:id).
