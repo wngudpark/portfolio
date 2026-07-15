@@ -103,8 +103,16 @@ collections:
     format: yaml-frontmatter
     summary: "{{company}} · {{position}}"
     fields:
-      - { name: company, label: 회사명 / 소속, widget: string }
+      - { name: company, label: 회사명 / 소속, widget: string, hint: "프리랜서면 '프리랜서' 또는 클라이언트명" }
       - { name: position, label: 직무 / 포지션, widget: string }
+      - {
+          name: freelance,
+          label: 프리랜서 여부,
+          widget: boolean,
+          default: false,
+          required: false,
+          hint: "켜면 '프리랜서' 배지가 표시됩니다",
+        }
       - {
           name: start_date,
           label: 시작일,

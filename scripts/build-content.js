@@ -84,6 +84,7 @@ function buildCareers() {
     id,
     company: data.company || '',
     position: data.position || '',
+    freelance: !!data.freelance,
     start_date: data.start_date ? String(data.start_date) : '',
     end_date: data.end_date ? String(data.end_date) : '', // empty = 재직중
     description: data.description || ''

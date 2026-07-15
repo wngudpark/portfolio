@@ -43,7 +43,9 @@
       "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('cfg_check.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('collections:', [c['name'] for c in d['collections']]\\); print\\('backend:', d['backend']\\); print\\('media_folder:', d.get\\('media_folder'\\), '| public_folder:', d.get\\('public_folder'\\)\\)\")",
       "Bash(curl -s -D - https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/callback?code=faketestcode123)",
       "Bash(curl -s https://portfolio-oauth-proxy.wngudpark-portfolio.workers.dev/callback?code=fake)",
-      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('site_url:', d.get\\('site_url'\\)\\); print\\('display_url:', d.get\\('display_url'\\)\\); print\\('collections:', [c['name'] for c in d['collections']]\\)\")"
+      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); print\\('YAML OK'\\); print\\('site_url:', d.get\\('site_url'\\)\\); print\\('display_url:', d.get\\('display_url'\\)\\); print\\('collections:', [c['name'] for c in d['collections']]\\)\")",
+      "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); c.forEach\\(x=>console.log\\(x.id, '| freelance:', x.freelance, '|', x.company\\)\\)\")",
+      "Bash(python -c \"import yaml; d=yaml.safe_load\\(open\\('admin/config.yml',encoding='utf-8'\\)\\); f=[c for c in d['collections'] if c['name']=='careers'][0]['fields']; print\\('careers fields:', [x['name'] for x in f]\\)\")"
     ]
   }
 }

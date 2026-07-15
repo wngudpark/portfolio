@@ -192,7 +192,11 @@ async function loadCareers() {
 
 function careerCard(c) {
   const period = formatPeriod(c.start_date, c.end_date);
-  const current = !c.end_date
+  // Freelance gets its own badge; "재직중" only for non-freelance ongoing roles.
+  const freelance = c.freelance
+    ? `<span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">프리랜서</span>`
+    : '';
+  const current = !c.end_date && !c.freelance
     ? `<span class="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">재직중</span>`
     : '';
 
@@ -204,7 +208,7 @@ function careerCard(c) {
           <p class="mt-0.5 font-medium text-brand-600">${escapeHtml(c.position)}</p>
         </div>
         <div class="flex items-center gap-2">
-          ${current}
+          ${freelance}${current}
           <span class="whitespace-nowrap text-sm text-slate-400">${escapeHtml(period)}</span>
         </div>
       </div>
