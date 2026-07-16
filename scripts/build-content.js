@@ -85,6 +85,16 @@ function descCompare(a, b) {
   return b - a;
 }
 
+// Tie-break by project name: English (Latin/ASCII-leading) titles first,
+// then Korean, each ordered alphabetically.
+function titleCompare(a, b) {
+  const group = (t) => (/^[A-Za-z0-9]/.test(String(t || '').trim()) ? 0 : 1);
+  const ga = group(a.title);
+  const gb = group(b.title);
+  if (ga !== gb) return ga - gb;
+  return String(a.title || '').localeCompare(String(b.title || ''), 'ko');
+}
+
 function buildProjects() {
   const items = readCollection('projects').map(({ id, data, content }) => {
     const images = normalizeImages(data);
@@ -104,7 +114,12 @@ function buildProjects() {
   items.sort((a, b) => {
     const ka = projectDateKeys(a.year);
     const kb = projectDateKeys(b.year);
-    return descCompare(ka.end, kb.end) || descCompare(ka.start, kb.start) || a.id.localeCompare(b.id);
+    return (
+      descCompare(ka.end, kb.end) ||
+      descCompare(ka.start, kb.start) ||
+      titleCompare(a, b) ||
+      a.id.localeCompare(b.id)
+    );
   });
   return items;
 }
