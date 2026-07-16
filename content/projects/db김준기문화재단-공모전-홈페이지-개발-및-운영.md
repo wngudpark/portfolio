@@ -9,7 +9,7 @@ stack:
   - Spring Security
   - MyBatis
   - JSP
-  - MariaDB
+  - MySQL
   - git
 link: https://www.dbifc.co.kr/
 images:
