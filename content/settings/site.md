@@ -8,7 +8,7 @@ skills:
   - PHP
   - React
   - JavaScript
-  - JQuery
+  - jQuery
   - TypeScript
   - HTML/CSS
   - MySQL
