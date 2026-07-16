@@ -8,7 +8,6 @@ stack:
   - JavaScript
   - JWT
   - jQuery
-  - ExcelJS
   - MySQL
 images:
   - /static/images/어나더1.png
