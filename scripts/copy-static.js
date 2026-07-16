@@ -7,7 +7,8 @@ const ROOT = path.join(__dirname, '..');
 const DIST = path.join(ROOT, 'dist');
 
 // Top-level files and directories to publish as-is.
-const ENTRIES = ['index.html', 'favicon.svg', '.nojekyll', 'js', 'admin', 'static', 'css/styles.css'];
+// NOTE: static/images is handled separately by optimize-images.js (resize + compress).
+const ENTRIES = ['index.html', 'favicon.svg', '.nojekyll', 'js', 'admin', 'css/styles.css'];
 
 function copyRecursive(src, dest) {
   const stat = fs.statSync(src);
