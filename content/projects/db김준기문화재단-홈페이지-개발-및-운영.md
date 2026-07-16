@@ -10,6 +10,8 @@ stack:
   - Spring Security
   - MyBatis
   - JSP
+  - MySQL
+  - git
 link: https://www.dbfoundation.or.kr/
 images:
   - /static/images/재단.png
