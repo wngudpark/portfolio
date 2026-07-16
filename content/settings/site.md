@@ -3,14 +3,16 @@ role: Developer
 name: 박주형
 tagline: 꾸준히 배우고 만드는 것을 좋아하는 개발자입니다.
 skills:
-  - JavaScript
-  - TypeScript
+  - Java
+  - Spring
+  - PHP
   - React
+  - TypeScript
   - HTML/CSS
   - MySQL
-  - SQLite
-  - Git
+  - Oracle
   - Docker
+  - git
   - Linux
 ---
 재단·공모전 운영 시스템, 결제 연동, 캠퍼스 방문자 데이터 분석, 홍보 이벤트 게임까지 도메인이 서로 다른 프로젝트들을 거치며 실무 경험을 쌓아온 개발자입니다. 결제, 인증, 통계 집계처럼 실수 하나가 곧바로 사용자 피해나 매출 손실로 이어지는 영역을 여러 번 다뤄오면서, 예외 상황을 촘촘히 방어하는 설계에 특히 신경 쓰는 습관이 생겼습니다.
