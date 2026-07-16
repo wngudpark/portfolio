@@ -7,6 +7,8 @@ skills:
   - Spring
   - PHP
   - React
+  - JavaScript
+  - JQuery
   - TypeScript
   - HTML/CSS
   - MySQL
