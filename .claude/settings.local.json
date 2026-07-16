@@ -60,7 +60,9 @@
       "Bash(node -e \"const t=require\\('./dist/data/projects.json'\\).find\\(x=>x.id==='_break-test'\\); console.log\\(t.detail_html\\)\")",
       "Bash(sed -n '/<section id=\"career\"/,/<\\\\/section>/p' index.html)",
       "Bash(node -e \"const c=require\\('./dist/data/careers.json'\\); console.log\\(JSON.stringify\\(c[0],null,2\\)\\); console.log\\('총', c.length,'건'\\)\")",
-      "Bash(awk '{printf \"projects.json: %.1f KB\\\\n\", $1/1024}')"
+      "Bash(awk '{printf \"projects.json: %.1f KB\\\\n\", $1/1024}')",
+      "Bash(node -e \"require\\('./dist/data/projects.json'\\).forEach\\(p=>console.log\\(JSON.stringify\\(p.year\\), '  <-', p.id\\)\\)\")",
+      "Bash(node -e \"require\\('./dist/data/projects.json'\\).forEach\\(\\(p,i\\)=>console.log\\(String\\(i+1\\).padStart\\(2\\),'|', \\(p.year||'\\(없음\\)'\\).padEnd\\(22\\), '|', p.id\\)\\)\")"
     ]
   }
 }

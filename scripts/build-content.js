@@ -60,6 +60,31 @@ function normalizeImages(data) {
   return list.map(toRelative).filter(Boolean).slice(0, 3);
 }
 
+// Extract sortable month keys from a free-form `year` like "2025.12 ~ 2026.07",
+// "2026.05", or "2024". end = latest date (range end, or the single date);
+// start = earliest date. Bare years count as December (latest within the year).
+// "현재/진행중" style text → ongoing (sorts newest). No date → sorts last.
+function projectDateKeys(year) {
+  const str = String(year || '');
+  const ongoing = /현재|진행|present|ongoing|now/i.test(str);
+  const months = [];
+  const re = /(\d{4})(?:[.\-/](\d{1,2}))?/g;
+  let m;
+  while ((m = re.exec(str)) !== null) {
+    months.push(+m[1] * 12 + (m[2] ? +m[2] : 12));
+  }
+  return {
+    end: ongoing ? Infinity : months.length ? Math.max(...months) : -Infinity,
+    start: months.length ? Math.min(...months) : -Infinity
+  };
+}
+
+// Descending compare that is safe for Infinity/-Infinity (avoids NaN).
+function descCompare(a, b) {
+  if (a === b) return 0;
+  return b - a;
+}
+
 function buildProjects() {
   const items = readCollection('projects').map(({ id, data, content }) => {
     const images = normalizeImages(data);
@@ -75,8 +100,12 @@ function buildProjects() {
       detail_html: rewriteAssetPaths(marked.parse(content || ''))
     };
   });
-  // Newest year first, then stable by id.
-  items.sort((a, b) => (b.year || '').localeCompare(a.year || '') || a.id.localeCompare(b.id));
+  // Sort by end date (latest first); tie-break by start date, then id.
+  items.sort((a, b) => {
+    const ka = projectDateKeys(a.year);
+    const kb = projectDateKeys(b.year);
+    return descCompare(ka.end, kb.end) || descCompare(ka.start, kb.start) || a.id.localeCompare(b.id);
+  });
   return items;
 }
 
