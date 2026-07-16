@@ -301,7 +301,7 @@ function projectCard(p) {
   // Thumbnail with an icon placeholder fallback when none is set.
   const thumbHtml = p.thumbnail_url
     ? `<img src="${escapeHtml(p.thumbnail_url)}" alt="${escapeHtml(p.title)}"
-         class="mb-4 h-44 w-full rounded-lg object-cover" loading="lazy" />`
+         class="mb-4 h-44 w-full rounded-lg object-cover object-center" loading="lazy" />`
     : `<div class="mb-4 flex h-44 w-full items-center justify-center rounded-lg bg-slate-100 text-slate-300">
          <i data-lucide="image" class="h-10 w-10"></i>
        </div>`;
@@ -353,8 +353,10 @@ function detailHtml(p) {
     ? `<div class="mt-6 space-y-4">${images
         .map(
           (src) =>
-            `<img src="${escapeHtml(src)}" alt="${escapeHtml(p.title)}"
-               class="w-full rounded-xl border border-slate-200" loading="lazy" />`
+            `<div class="aspect-video w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+               <img src="${escapeHtml(src)}" alt="${escapeHtml(p.title)}"
+                 class="h-full w-full object-contain" loading="lazy" />
+             </div>`
         )
         .join('')}</div>`
     : '';
