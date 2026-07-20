@@ -10,7 +10,7 @@ stack:
   - Phaser 3
   - Electron
   - MySQL
-link: https://www.beesurvival.co.kr/
+link: ""
 images:
   - /static/images/꿀벌2.png
   - /static/images/꿀벌1.png
